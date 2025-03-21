@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,6 +16,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f7f9fc;
+            text-align: center;
         }
 
         h1 {
@@ -22,24 +24,41 @@
         }
 
         p {
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
-        input {
+        input, button {
             padding: 10px;
-            width: 300px;
-            margin-right: 10px;
+            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            width: 300px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        .color-picker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .color-picker input[type="text"] {
+            width: 100px;
+            margin-left: 10px;
+            text-align: center;
         }
 
         button {
-            padding: 10px 15px;
             cursor: pointer;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
             transition: background-color 0.3s ease;
         }
 
@@ -61,22 +80,47 @@
 </head>
 <body>
 <h1>QR Code Generator</h1>
+
 <p>Введите текст или URL:</p>
+<input type="text" id="textInput" placeholder="Пример: https://example.com" />
+
+<p>Выберите размер (px):</p>
+<input type="number" id="sizeInput" placeholder="Например: 256" min="100" max="1000" value="256" />
+
+<p>Цвет QR-кода:</p>
+<div class="color-picker">
+    <input type="color" id="colorInput" value="#000000" onchange="updateColorValue('colorInput', 'colorValue')" />
+    <input type="text" id="colorValue" value="#000000" maxlength="7" oninput="updateColorPicker('colorInput', 'colorValue')" />
+</div>
+
+<p>Цвет фона:</p>
+<div class="color-picker">
+    <input type="color" id="bgColorInput" value="#ffffff" onchange="updateColorValue('bgColorInput', 'bgColorValue')" />
+    <input type="text" id="bgColorValue" value="#ffffff" maxlength="7" oninput="updateColorPicker('bgColorInput', 'bgColorValue')" />
+</div>
+
 <div>
-    <input type="text" id="textInput" placeholder="Пример: https://example.com" />
     <button onclick="generateQRCode()">Сгенерировать QR-код</button>
+    <button onclick="saveQRCodeAsPNG()">Сохранить как PNG</button>
+    <button onclick="saveQRCodeAsPDF()">Сохранить как PDF</button>
 </div>
 
 <!-- Элемент для отображения QR-кода -->
 <div id="qrcode"></div>
 
 <script>
+    let currentQRCode = null;
+
     function generateQRCode() {
         const qrDiv = document.getElementById("qrcode");
         const text = document.getElementById("textInput").value;
+        const size = parseInt(document.getElementById("sizeInput").value, 10);
+        const colorDark = document.getElementById("colorInput").value;
+        const colorLight = document.getElementById("bgColorInput").value;
 
         // Удаляем старый QR-код, если он существует
         qrDiv.innerHTML = "";
+        currentQRCode = null;
 
         if (!text.trim()) {
             alert("Пожалуйста, введите текст или URL для генерации QR-кода.");
@@ -84,14 +128,85 @@
         }
 
         // Генерация QR-кода
-        new QRCode(qrDiv, {
+        currentQRCode = new QRCode(qrDiv, {
             text: text,
-            width: 256, // Ширина
-            height: 256, // Высота
-            colorDark: "#000000", // Цвет QR-кода
-            colorLight: "#ffffff", // Фон
+            width: size, // Ширина
+            height: size, // Высота
+            colorDark: colorDark, // Цвет QR-кода
+            colorLight: colorLight, // Фон
             correctLevel: QRCode.CorrectLevel.H // Уровень коррекции ошибок
         });
+    }
+
+    function saveQRCodeAsPNG() {
+        if (!currentQRCode) {
+            alert("Сначала сгенерируйте QR-код.");
+            return;
+        }
+
+        const qrCanvas = document.querySelector("#qrcode canvas");
+        if (!qrCanvas) {
+            alert("Ошибка: Не удалось найти QR-код.");
+            return;
+        }
+
+        // Преобразование Canvas в изображение
+        const image = qrCanvas.toDataURL("image/png");
+
+        // Создание ссылки для скачивания
+        const downloadLink = document.createElement("a");
+        downloadLink.href = image;
+        downloadLink.download = "qrcode.png";
+        downloadLink.click();
+    }
+
+    async function saveQRCodeAsPDF() {
+        if (!currentQRCode) {
+            alert("Сначала сгенерируйте QR-код.");
+            return;
+        }
+
+        const qrCanvas = document.querySelector("#qrcode canvas");
+        if (!qrCanvas) {
+            alert("Ошибка: Не удалось найти QR-код.");
+            return;
+        }
+
+        // Преобразуем Canvas в Base64 изображение
+        const image = qrCanvas.toDataURL("image/png");
+
+        // Создание PDF с помощью библиотеки jsPDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+
+        // Определяем размеры изображения
+        const imgProps = pdf.getImageProperties(image);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        // Добавление изображения в PDF
+        pdf.addImage(image, "PNG", 0, 20, pdfWidth, pdfHeight);
+
+        // Сохранение PDF
+        pdf.save("qrcode.pdf");
+    }
+
+    // Управление цветами
+    function updateColorValue(colorInputId, textInputId) {
+        const colorInput = document.getElementById(colorInputId);
+        const textInput = document.getElementById(textInputId);
+        textInput.value = colorInput.value;
+    }
+
+    function updateColorPicker(colorInputId, textInputId) {
+        const colorInput = document.getElementById(colorInputId);
+        const textInput = document.getElementById(textInputId);
+        const hexValue = textInput.value;
+
+        // Проверяем формат HEX
+        if (/^#[0-9A-Fa-f]{6}$/.test(hexValue)) {
+            colorInput.value = hexValue;
+        }
     }
 </script>
 </body>
