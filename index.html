@@ -37,7 +37,7 @@
 
         input[type="color"] {
             width: 50px;
-            padding: 5px;
+            padding: 0px;
             margin-right: 10px;
         }
 
@@ -172,6 +172,9 @@
             return;
         }
 
+        // Получаем размер QR-кода в px
+        const size = parseInt(document.getElementById("sizeInput").value, 10);
+
         // Преобразуем Canvas в Base64 изображение
         const image = qrCanvas.toDataURL("image/png");
 
@@ -179,15 +182,13 @@
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
 
-        // Определяем размеры изображения
-        const imgProps = pdf.getImageProperties(image);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        // Конвертируем размер из px в mm (1px = 0.264583 mm)
+        const sizeInMm = size * 0.264583;
 
-        // Добавление изображения в PDF
-        pdf.addImage(image, "PNG", 0, 20, pdfWidth, pdfHeight);
+        // Добавляем изображение в PDF с точным размером
+        pdf.addImage(image, "PNG", 10, 10, sizeInMm, sizeInMm);
 
-        // Сохранение PDF
+        // Сохраняем PDF
         pdf.save("qrcode.pdf");
     }
 
