@@ -1,0 +1,1 @@
+Free qr code generator without ads
