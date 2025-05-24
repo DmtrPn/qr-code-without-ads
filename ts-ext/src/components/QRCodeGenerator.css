@@ -1,0 +1,82 @@
+.qr-generator {
+    font-family: Arial, sans-serif;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    height: 100vh;
+    margin: 0;
+
+    text-align: center;
+
+    background-color: #f7f9fc;
+}
+
+.qr-generator h1 {
+    margin-bottom: 10px;
+}
+
+.qr-generator p {
+    margin-bottom: 5px;
+}
+
+.qr-generator input,
+.qr-generator button {
+    width: 300px;
+    margin-bottom: 10px;
+    padding: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.qr-generator input[type='color'] {
+    width: 50px;
+    margin-right: 10px;
+    padding: 0;
+}
+
+.qr-generator .color-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+}
+
+.qr-generator .color-picker input[type='text'] {
+    width: 100px;
+    margin-left: 10px;
+
+    text-align: center;
+}
+
+.qr-generator button {
+    margin-right: 5px;
+
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    color: white;
+    border: none;
+    background-color: #007bff;
+}
+
+.qr-generator button:hover {
+    background-color: #0056b3;
+}
+
+.qr-generator #qrcode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 20px;
+    padding: 15px;
+
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
