@@ -1,0 +1,15 @@
+{
+  "name": "QR Side pannel",
+  "version": "0.1",
+  "manifest_version": 3,
+  "description": "Provides definitions in the side panel.",
+  "icons": {
+    "128": "images/icon-128.png",
+    "16": "images/icon-16.png"
+  },
+  "host_permissions": ["https://cdn.jsdelivr.net/*", "https://cdnjs.cloudflare.com/*"],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel", "contextMenus", "storage"]
+}
