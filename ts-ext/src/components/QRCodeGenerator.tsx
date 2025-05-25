@@ -12,26 +12,10 @@ export function QRCodeGenerator() {
 
     const qrDivRef = useRef<HTMLDivElement>(null);
 
-    const generateQRCode = () => {
-        if (!qrDivRef.current) return;
-
-        qrDivRef.current.innerHTML = '';
-
-        if (!text.trim()) {
-            alert('Пожалуйста, введите текст или URL для генерации QR-кода.');
-            return;
-        }
-    };
-
     const saveQRCodeAsPNG = () => {
-        if (!text) {
-            alert('Сначала сгенерируйте QR-код.');
-            return;
-        }
-
         const qrCanvas = qrDivRef.current?.querySelector('canvas');
         if (!qrCanvas) {
-            alert('Ошибка: Не удалось найти QR-код.');
+            alert('Errir: QR Code not found.');
             return;
         }
 
@@ -52,20 +36,19 @@ export function QRCodeGenerator() {
         <div className="qr-generator">
             <h1>QR Code Generator</h1>
 
-            <p>Введите текст или URL:</p>
+            <p>Enter text or URL:</p>
             <input
-                type="text"
                 value={text}
                 onInput={e => setText((e.target as HTMLInputElement).value)}
-                placeholder="Пример: https://example.com"
+                placeholder="For example: https://example.com"
             />
 
-            <p>Выберите размер (px):</p>
+            <p>Entry size (px):</p>
             <input
                 type="number"
                 value={size}
                 onInput={e => setSize(parseInt((e.target as HTMLInputElement).value, 10))}
-                placeholder="Например: 256"
+                placeholder="For example: 256"
                 min="100"
                 max="1000"
             />
@@ -73,22 +56,25 @@ export function QRCodeGenerator() {
             <p>Цвет QR-кода:</p>
             <div className="color-picker">
                 <input type="color" value={colorDark} onInput={e => updateColorValue(e, setColorDark)} />
-                <input type="text" value={colorDark} onInput={e => updateColorValue(e, setColorDark)} maxLength={7} />
+                <input value={colorDark} onInput={e => updateColorValue(e, setColorDark)} maxLength={7} />
             </div>
 
             <p>Цвет фона:</p>
             <div className="color-picker">
                 <input type="color" value={colorLight} onInput={e => updateColorValue(e, setColorLight)} />
-                <input type="text" value={colorLight} onInput={e => updateColorValue(e, setColorLight)} maxLength={7} />
+                <input value={colorLight} onInput={e => updateColorValue(e, setColorLight)} maxLength={7} />
             </div>
 
             <div>
-                <button onClick={generateQRCode}>Сгенерировать QR-код</button>
-                <button onClick={saveQRCodeAsPNG}>Сохранить как PNG</button>
+                <button disabled={text.length === 0} onClick={saveQRCodeAsPNG}>
+                    Save as PNG
+                </button>
             </div>
 
             <div id="qrcode" ref={qrDivRef}>
-                <QRCodeCanvas text={text} margin={1} width={size} color={{ dark: colorDark, light: colorLight }} />
+                {text.length > 0 && (
+                    <QRCodeCanvas text={text} margin={1} width={size} color={{ dark: colorDark, light: colorLight }} />
+                )}
             </div>
         </div>
     );
