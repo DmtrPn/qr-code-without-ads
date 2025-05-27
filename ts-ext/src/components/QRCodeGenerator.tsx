@@ -27,6 +27,11 @@ export function QRCodeGenerator() {
         downloadLink.click();
     };
 
+    const updateSize = (e: Event) => {
+        const newSize = parseInt((e.target as HTMLInputElement).value, 10);
+        setSize(newSize < 400 ? (newSize > 50 ? newSize : 50) : 400);
+    };
+
     const updateColorValue = (e: Event, setter: (value: string) => void) => {
         const input = e.target as HTMLInputElement;
         setter(input.value);
@@ -44,14 +49,7 @@ export function QRCodeGenerator() {
             />
 
             <p>Entry size (px):</p>
-            <input
-                type="number"
-                value={size}
-                onInput={e => setSize(parseInt((e.target as HTMLInputElement).value, 10))}
-                placeholder="For example: 256"
-                min="100"
-                max="1000"
-            />
+            <input type="number" value={size} onInput={updateSize} placeholder="For example: 256" />
 
             <p>Цвет QR-кода:</p>
             <div className="color-picker">

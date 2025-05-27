@@ -1,0 +1,17 @@
+{
+  "name": "QR Side pannel",
+  "version": "0.1",
+  "manifest_version": 3,
+  "description": "QR code generator",
+  "icons": {
+    "128": "images/128x128.png",
+    "48": "images/48x48.png",
+    "32": "images/32x32.png",
+    "16": "images/16x16.png"
+  },
+  "host_permissions": [],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel"]
+}
